@@ -1,0 +1,8 @@
+.DS_Store
+node_modules/
+.firebase/
+*.log
+.env
+.env.*
+service-account*.json
+.claude/settings.local.json
