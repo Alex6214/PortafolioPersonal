@@ -1,11 +1,15 @@
 // Lectura del contenido público usando la API REST de Firestore.
 // No carga el SDK de Firebase (~300 KB), así el portafolio abre más rápido.
-import { firebaseConfig, COLLECTIONS } from './config.js';
+import { getFirebaseConfig, COLLECTIONS } from './config.js';
 import { SEED, SEED_PROFILE } from './seed.js';
 import { byOrder, isVisible } from './util.js';
 
-const BASE = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
-const KEY = `key=${firebaseConfig.apiKey}`;
+// Si la configuración no carga, el sitio igual se muestra con el contenido del CV.
+const firebaseConfig = await getFirebaseConfig().catch(() => null);
+const BASE = firebaseConfig
+  ? `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`
+  : '';
+const KEY = firebaseConfig ? `key=${firebaseConfig.apiKey}` : '';
 
 function decodeValue(v) {
   if ('stringValue' in v) return v.stringValue;
@@ -56,6 +60,10 @@ export async function loadContent() {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 6000);
   const result = { source: 'firestore' };
+  if (!firebaseConfig) {
+    clearTimeout(timer);
+    return { source: 'seed', profile: SEED_PROFILE, ...SEED };
+  }
   try {
     const [profileDoc, ...lists] = await Promise.all([
       getJson(`${BASE}/settings/profile?${KEY}`, ctrl.signal).catch(() => null),
@@ -81,6 +89,7 @@ export async function loadContent() {
 // Envía un mensaje de contacto. createdAt lo pone el servidor (REQUEST_TIME),
 // tal como exigen las reglas.
 export async function sendMessage({ name, email, message }) {
+  if (!firebaseConfig) throw new Error('Configuración de Firebase no disponible');
   const id = crypto.randomUUID().replaceAll('-', '');
   const docName = `projects/${firebaseConfig.projectId}/databases/(default)/documents/messages/${id}`;
   const body = {

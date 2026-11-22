@@ -1,13 +1,15 @@
-// Configuración web pública de Firebase (no es secreta: la seguridad la dan
-// Authentication y las reglas de Firestore).
-export const firebaseConfig = {
-  apiKey: 'AIzaSyCW4anxzBHWNZxZhyagaOT9rbh37QawXNU',
-  authDomain: 'portafolioalex-afb50.firebaseapp.com',
-  projectId: 'portafolioalex-afb50',
-  storageBucket: 'portafolioalex-afb50.firebasestorage.app',
-  messagingSenderId: '375917315908',
-  appId: '1:375917315908:web:3b444d9e8f03b9311a7911',
-};
+// La configuración web de Firebase NO se guarda en el repositorio.
+// Firebase Hosting la publica automáticamente en /__/firebase/init.json
+// (también el emulador: `firebase emulators:start --only hosting`).
+let configPromise;
+
+export function getFirebaseConfig() {
+  configPromise ??= fetch('/__/firebase/init.json').then((res) => {
+    if (!res.ok) throw new Error(`No se pudo leer la configuración de Firebase (${res.status})`);
+    return res.json();
+  });
+  return configPromise;
+}
 
 // Colecciones que forman el portafolio (el orden aquí no importa; cada
 // elemento tiene su propio campo "order").

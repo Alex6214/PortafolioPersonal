@@ -73,10 +73,11 @@ firebase.json         Hosting + cabeceras de seguridad (CSP)
 
 ## Comandos
 
-Probar en local (http://localhost:5173):
+Probar en local (http://localhost:5002). Usa el emulador de Hosting porque es el que entrega
+la configuración de Firebase en `/__/firebase/init.json`:
 
 ```bash
-python3 -m http.server 5173 --directory public
+firebase emulators:start --only hosting:principal
 ```
 
 Publicar:
@@ -87,7 +88,9 @@ firebase deploy --only hosting,firestore:rules   # publica en alexanderguevara.w
 
 ## Seguridad
 
-- `js/config.js` no es secreto; la protección la dan Authentication y las reglas.
+- La configuración web de Firebase (incluida la API key) **no está en el repositorio**: Firebase Hosting
+  la entrega en `/__/firebase/init.json`. Esa key igual es pública en el navegador; la protección real
+  la dan Authentication, las reglas de Firestore y las restricciones de la key en Google Cloud.
 - Recomendado: en Google Cloud → *APIs y servicios* → *Credenciales*, restringe la *Browser key*
   a `localhost`, `alexanderguevara.web.app`, `portafolioalex-afb50.web.app` y `portafolioalex-afb50.firebaseapp.com`.
 - Nunca subas `.env`, contraseñas ni claves de servicio (`.gitignore` ya los excluye).
