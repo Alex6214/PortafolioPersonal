@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "portafolioalex-afb50"
-  }
+  },
+  "targets": {
+    "portafolioalex-afb50": {
+      "hosting": {
+        "principal": [
+          "alexanderguevara"
+        ],
+        "original": [
+          "portafolioalex-afb50"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

@@ -2,8 +2,8 @@
 
 Portafolio personal dinámico con panel administrativo privado.
 
-- **Sitio público:** https://portafolioalex-afb50.web.app
-- **Panel:** https://portafolioalex-afb50.web.app/admin (solo el administrador)
+- **Sitio público:** https://alexanderguevara.web.app
+- **Panel:** https://alexanderguevara.web.app/admin (solo el administrador)
 
 ## Tecnologías
 
@@ -82,12 +82,12 @@ python3 -m http.server 5173 --directory public
 Publicar:
 
 ```bash
-firebase deploy --only hosting,firestore:rules
+firebase deploy --only hosting,firestore:rules   # publica en alexanderguevara.web.app y portafolioalex-afb50.web.app
 ```
 
 ## Seguridad
 
 - `js/config.js` no es secreto; la protección la dan Authentication y las reglas.
 - Recomendado: en Google Cloud → *APIs y servicios* → *Credenciales*, restringe la *Browser key*
-  a `localhost`, `portafolioalex-afb50.web.app` y `portafolioalex-afb50.firebaseapp.com`.
+  a `localhost`, `alexanderguevara.web.app`, `portafolioalex-afb50.web.app` y `portafolioalex-afb50.firebaseapp.com`.
 - Nunca subas `.env`, contraseñas ni claves de servicio (`.gitignore` ya los excluye).
