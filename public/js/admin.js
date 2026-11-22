@@ -5,7 +5,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
 import {
   doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, getDocs,
-  query, orderBy, writeBatch, serverTimestamp,
+  query, orderBy, limit, writeBatch, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 import { PROFILE_FIELDS, SECTIONS } from './schema.js';
 import { SEED_PROFILE, seedItems } from './seed.js';
@@ -179,6 +179,11 @@ async function renderProfile() {
   const snap = await getDoc(doc(db, 'settings', 'profile'));
   const exists = snap.exists();
   const profile = exists ? snap.data() : SEED_PROFILE;
+  const emptyCols = [];
+  for (const col of COLLECTIONS) {
+    if ((await getDocs(query(collection(db, col), limit(1)))).empty) emptyCols.push(SECTIONS[col].label);
+  }
+  const needsSeed = !exists || emptyCols.length > 0;
   const main = $('#main');
   main.innerHTML = `
     <header class="page-head">
@@ -187,11 +192,11 @@ async function renderProfile() {
         <p class="muted">Lo que aparece en la portada, "Sobre mí" y contacto.</p>
       </div>
     </header>
-    ${exists ? '' : `
+    ${!needsSeed ? '' : `
       <div class="banner">
         <div>
-          <strong>Tu base de datos está vacía.</strong>
-          <p>El sitio está mostrando el contenido de tu CV como respaldo. Cárgalo a Firestore para poder editarlo desde aquí.</p>
+          <strong>${exists ? `Faltan secciones por cargar: ${esc(emptyCols.join(', '))}.` : 'Tu base de datos está vacía.'}</strong>
+          <p>El sitio muestra el contenido de tu CV como respaldo. Cárgalo a Firestore para poder editarlo desde aquí. Lo que ya guardaste no se toca.</p>
         </div>
         <button class="btn btn--primary" id="seedAll" type="button">Cargar contenido inicial</button>
       </div>`}
@@ -213,7 +218,6 @@ async function renderProfile() {
     try {
       await setDoc(doc(db, 'settings', 'profile'), { ...data, updatedAt: serverTimestamp() }, { merge: true });
       toast('Perfil guardado. Ya se ve en el portafolio.');
-      if (!exists) go('profile');
     } catch (err) { toast(friendlyError(err), 'err'); } finally { btn.disabled = false; }
   });
   $('#seedAll')?.addEventListener('click', seedAll);

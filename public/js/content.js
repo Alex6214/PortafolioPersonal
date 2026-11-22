@@ -38,9 +38,13 @@ async function getJson(url, signal) {
   return res.json();
 }
 
+// Devuelve null si la colección no tiene ningún documento (se usará el CV),
+// o la lista de elementos visibles (puede quedar vacía si todos están ocultos).
 async function loadCollection(name, signal) {
   const data = await getJson(`${BASE}/${name}?pageSize=300&${KEY}`, signal);
-  return (data?.documents || [])
+  const docs = data?.documents || [];
+  if (docs.length === 0) return null;
+  return docs
     .map((d) => ({ id: d.name.split('/').pop(), ...decodeFields(d.fields || {}) }))
     .filter(isVisible)
     .sort(byOrder);
@@ -65,7 +69,7 @@ export async function loadContent() {
   let usedSeed = false;
   if (!result.profile) { result.profile = SEED_PROFILE; usedSeed = true; }
   for (const c of COLLECTIONS) {
-    if (!result[c] || (result[c].length === 0 && usedSeed)) {
+    if (!result[c]) {
       result[c] = SEED[c];
       usedSeed = true;
     }
